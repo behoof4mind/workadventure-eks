@@ -2,6 +2,8 @@
 repositories:
   - name: behoof4mind
     url:  https://behoof4mind.github.io/helm-charts/
+  - name: traefik
+    url:  https://helm.traefik.io/traefik
 
 releases:
   - name: traefik
