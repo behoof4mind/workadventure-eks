@@ -41,7 +41,7 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         with:
-          command: echo $KUBE_CONFIG_DATA | base64 -d
+          command: kubectl config get-contexts
 #      - name: Sync helmfile and app state
 #        uses: behoof4mind/helm-eks-action@master
 #        env:
