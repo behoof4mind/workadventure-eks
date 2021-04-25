@@ -1,7 +1,7 @@
 
 repositories:
   - name: behoof4mind
-    url:  https://behoof4mind.github.io/helm-charts/
+    url:  https://behoof4mind.github.io/helm-chart
   - name: traefik
     url:  https://helm.traefik.io/traefik
   - name: bitnami
