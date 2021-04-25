@@ -25,23 +25,29 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-      - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@master
-        with:
-          find: "MY_AWS_KEY"
-          replace: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@master
-        with:
-          find: "MY_AWS_SECRET"
-          replace: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Sync helmfile and app state
+          aws-region: us-east-2
+#      - name: Find and Replace
+#        uses: jacobtomlinson/gha-find-replace@master
+#        with:
+#          find: "MY_AWS_KEY"
+#          replace: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#      - name: Find and Replace
+#        uses: jacobtomlinson/gha-find-replace@master
+#        with:
+#          find: "MY_AWS_SECRET"
+#          replace: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: check cluster availability
         uses: behoof4mind/helm-eks-action@master
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         with:
-          command: helmfile sync
+          command: echo $KUBE_CONFIG_DATA | base64 -d
+#      - name: Sync helmfile and app state
+#        uses: behoof4mind/helm-eks-action@master
+#        env:
+#          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+#        with:
+#          command: helmfile sync
 #      - uses: actions/github-script@0.9.0
 #        env:
 #          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
