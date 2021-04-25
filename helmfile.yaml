@@ -4,6 +4,8 @@ repositories:
     url:  https://behoof4mind.github.io/helm-charts/
   - name: traefik
     url:  https://helm.traefik.io/traefik
+  - name: bitnami
+    url:  https://charts.bitnami.com/bitnami
 
 releases:
   - name: traefik
