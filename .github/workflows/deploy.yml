@@ -37,6 +37,7 @@ jobs:
         uses: mamezou-tech/setup-helmfile@v0.8.0
       - name: Test
         run: |
+          cat ~/.kube/config
           helmfile --version
           helm version
           kubectl version --client
