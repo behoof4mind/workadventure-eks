@@ -11,7 +11,7 @@ on:
 
 name: Deploy app
 jobs:
-  prepare-ci-environment1:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: hashicorp/setup-terraform@v1
