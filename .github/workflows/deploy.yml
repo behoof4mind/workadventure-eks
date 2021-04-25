@@ -31,7 +31,7 @@ jobs:
         with:
           files: 'helmfile.yaml'
           replacements: '$AWS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }},$AWS_SECRET=${{ secrets.AWS_SECRET_ACCESS_KEY }}'
-      - name: helm deploy
+      - name: sync helmfile and app state
         uses: behoof4mind/helm-eks-action@master
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
