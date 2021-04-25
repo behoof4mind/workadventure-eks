@@ -35,7 +35,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "MY_AWS_SECRET"
-          replace:${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          replace: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Sync helmfile and app state
         uses: behoof4mind/helm-eks-action@master
         env:
