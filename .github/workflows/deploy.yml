@@ -13,6 +13,10 @@ name: Deploy app
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-2
     steps:
       - uses: actions/checkout@v2
       - name: Checkout
@@ -27,32 +31,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-      - name: Trigger deploy
-        uses: Consensys/kubernetes-action@master
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA_BASE64 }}
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@master
         with:
-          args: get namespaces
-#      - name: AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: us-east-2
-#      - name: Find and Replace
-#        uses: jacobtomlinson/gha-find-replace@master
-#        with:
-#          find: "MY_AWS_KEY"
-#          replace: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#      - name: Find and Replace
-#        uses: jacobtomlinson/gha-find-replace@master
-#        with:
-#          find: "MY_AWS_SECRET"
-#          replace: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          find: "MY_AWS_KEY"
+          replace: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "MY_AWS_SECRET"
+          replace: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: check cluster availability
         uses: behoof4mind/helm-eks-action@master
         env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA_BASE64 }}
         with:
           command: kubectl config get-contexts
 #      - name: Sync helmfile and app state
