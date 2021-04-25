@@ -9,7 +9,7 @@ on:
         required: false
         description: 'Test scenario tags'
 
-name: Configure AWS EKS and deploy app
+name: Prepare EKS and deploy app
 jobs:
   prepare-ci-environment:
     runs-on: ubuntu-latest
