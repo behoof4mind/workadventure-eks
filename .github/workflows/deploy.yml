@@ -27,9 +27,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Replace image in config
-        uses: ./.github/actions/replace
+        uses: datamonsters/replace-action
         with:
-          files: helmfile.yaml
+          files: 'helmfile.yaml'
           replacements: '$AWS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }},$AWS_SECRET=${{ secrets.AWS_SECRET_ACCESS_KEY }}'
       - name: helm deploy
         uses: behoof4mind/helm-eks-action@master
