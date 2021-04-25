@@ -26,11 +26,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-      - name: Replace image in config
-        uses: datamonsters/replace-action
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@master
         with:
-          files: 'helmfile.yaml'
-          replacements: '$AWS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }},$AWS_SECRET=${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+          find: "MY_AWS_KEY"
+          replace: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "MY_AWS_SECRET"
+          replace:${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Sync helmfile and app state
         uses: behoof4mind/helm-eks-action@master
         env:

@@ -31,8 +31,8 @@ releases:
           domainFilters:
             - workadventure-game.link
           credentials:
-            accessKey: $AWS_KEY
-            secretKey: $AWS_SECRET
+            accessKey: MY_AWS_KEY
+            secretKey: MY_AWS_SECRET
   - name: workadventure
     namespace: workadventure
     chart: behoof4mind/workadventure-chart
