@@ -11,55 +11,8 @@ on:
 
 name: Deploy app
 jobs:
-  prepare-ci-environment:
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      BRANCH_NAME: ${{ github.head_ref }}
-    steps:
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 0.14.8
-      - uses: actions/checkout@v2
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/checkout@v2.2.0
-        with:
-          fetch-depth: 0
-#      - name: 'Get Previous tag'
-#        id: previoustag
-#        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v1
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v1
-#      - name: Login to DockerHub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#      - name: Build and push
-#        id: docker_build
-#        uses: docker/build-push-action@v2
-#        with:
-#          push: true
-#          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ steps.previoustag.outputs.tag }}-test
-#      - name: Image digest
-#        run: echo ${{ steps.docker_build.outputs.digest }}
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        working-directory: ./terraform
-        continue-on-error: true
   prepare-ci-environment1:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      BRANCH_NAME: ${{ github.head_ref }}
     steps:
       - uses: hashicorp/setup-terraform@v1
         with:
@@ -70,43 +23,24 @@ jobs:
       - uses: actions/checkout@v2.2.0
         with:
           fetch-depth: 0
-      - name: Terraform Init
-        id: init
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Copy kube-config
+        run: |-
+          mkdir -p ~/.kube
+          echo ${{ secrets.KUBE_CONFIG_DATA }} > ~/.kube/config
+      - name: Setup helmfile
+        uses: mamezou-tech/setup-helmfile@v0.8.0
+      - name: Test
         run: |
-          terraform init \
-          -backend-config="bucket=terraform-workadventure-state" \
-          -backend-config="key=workadventure-terraform.tfstate" \
-          -backend-config="dynamodb_table=terraform-workadventure-locks" \
-          -backend-config="encrypt=true"
-        working-directory: ./terraform
-#      - name: Setup Terraform variables
-#        working-directory: ./terraform
-#        id: vars
-#        run: |-
-#          cat > pipeline.auto.tfvars <<EOF
-#          env_prefix="test"
-#          is_temp_env=true
-#          app_version="${{ steps.previoustag.outputs.tag }}"
-#          max_ec2_instances=1
-#          min_ec2_instances=1
-#          EOF
-#      - name: Terraform validate
-#        id: validate
-#        run: terraform validate
-#        working-directory: ./terraform
-#        continue-on-error: true
-#      - name: Terraform Plan
-#        id: plan
-#        run: terraform plan -out tf.plan
-#        working-directory: ./terraform
-#      - name: Terraform Apply
-#        id: apply
-#        run: terraform apply tf.plan
-#        working-directory: ./terraform
-#      - name: Terraform Output
-#        id: get_url
-#        working-directory: ./terraform
-#        run: terraform output myservice_lb
+          helmfile --version
+          helm version
+          kubectl version --client
+          kubectl get ns
 #      - uses: actions/github-script@0.9.0
 #        env:
 #          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
