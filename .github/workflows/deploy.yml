@@ -3,13 +3,13 @@ on:
     inputs:
       logLevel:
         description: 'Log level'
-        required: true
+        required: false
         default: 'warning'
       tags:
         required: false
         description: 'Test scenario tags'
 
-name: Create PR Env
+name: Configure AWS EKS and deploy app
 jobs:
   prepare-ci-environment:
     runs-on: ubuntu-latest
@@ -53,10 +53,32 @@ jobs:
         run: terraform fmt -check
         working-directory: ./terraform
         continue-on-error: true
-#      - name: Terraform Init
-#        id: init
-#        run: terraform init -backend-config="bucket=terraform-my-service-state" -backend-config="key=terraform-test.tfstate" -backend-config="dynamodb_table=terraform-my-service-state-test" -backend-config="encrypt=true"
-#        working-directory: ./terraform
+  prepare-ci-environment1:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      BRANCH_NAME: ${{ github.head_ref }}
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.8
+      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+          -backend-config="bucket=terraform-workadventure-state" \
+          -backend-config="key=workadventure-terraform.tfstate" \
+          -backend-config="dynamodb_table=terraform-workadventure-locks" \
+          -backend-config="encrypt=true"
+        working-directory: ./terraform
 #      - name: Setup Terraform variables
 #        working-directory: ./terraform
 #        id: vars
