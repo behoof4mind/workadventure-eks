@@ -2,7 +2,7 @@ terraform {
   backend "s3" {}
 }
 
-module "webserver_cluster" {
+module "tf-module-workadventure" {
   source                          = "github.com/behoof4mind/tf-module-workadventure?ref=0.0.5"
   eks_region                      = "us-east-2"
   eks_cluster_version             = "1.18"
