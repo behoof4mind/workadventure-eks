@@ -1,0 +1,113 @@
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        required: false
+        description: 'Test scenario tags'
+
+name: Create PR Env
+jobs:
+  prepare-ci-environment:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      BRANCH_NAME: ${{ github.head_ref }}
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.8
+      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
+#      - name: 'Get Previous tag'
+#        id: previoustag
+#        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v1
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#      - name: Build and push
+#        id: docker_build
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ steps.previoustag.outputs.tag }}-test
+#      - name: Image digest
+#        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        working-directory: ./terraform
+        continue-on-error: true
+#      - name: Terraform Init
+#        id: init
+#        run: terraform init -backend-config="bucket=terraform-my-service-state" -backend-config="key=terraform-test.tfstate" -backend-config="dynamodb_table=terraform-my-service-state-test" -backend-config="encrypt=true"
+#        working-directory: ./terraform
+#      - name: Setup Terraform variables
+#        working-directory: ./terraform
+#        id: vars
+#        run: |-
+#          cat > pipeline.auto.tfvars <<EOF
+#          env_prefix="test"
+#          is_temp_env=true
+#          app_version="${{ steps.previoustag.outputs.tag }}"
+#          max_ec2_instances=1
+#          min_ec2_instances=1
+#          EOF
+#      - name: Terraform validate
+#        id: validate
+#        run: terraform validate
+#        working-directory: ./terraform
+#        continue-on-error: true
+#      - name: Terraform Plan
+#        id: plan
+#        run: terraform plan -out tf.plan
+#        working-directory: ./terraform
+#      - name: Terraform Apply
+#        id: apply
+#        run: terraform apply tf.plan
+#        working-directory: ./terraform
+#      - name: Terraform Output
+#        id: get_url
+#        working-directory: ./terraform
+#        run: terraform output myservice_lb
+#      - uses: actions/github-script@0.9.0
+#        env:
+#          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          script: |
+#            const output = `#### \`${{ steps.fmt.outcome }}\` Terraform Format and Style
+#            #### \`${{ steps.init.outcome }}\` Terraform Initialization
+#            #### ️\`${{ steps.validate.outcome }}\` Terraform Validation
+#            #### \`${{ steps.plan.outcome }}\` Terraform Plan
+#            #### Please check the service here: http://${{ fromJSON(steps.get_url.outputs.stdout) }}
+#
+#            <details><summary>Show Plan</summary>
+#
+#            \`\`\`${process.env.PLAN}\`\`\`
+#
+#            </details>
+#
+#            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+#
+#            github.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: output
+#            })
