@@ -34,7 +34,7 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         with:
-          command: helmfile version
+          command: helmfile sync
 #      - uses: actions/github-script@0.9.0
 #        env:
 #          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
