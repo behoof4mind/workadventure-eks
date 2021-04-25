@@ -11,7 +11,7 @@ on:
 
 name: Prepare EKS environment
 jobs:
-  prepare-ci-environment:
+  prepare-terraform:
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -62,6 +62,23 @@ jobs:
           -backend-config="dynamodb_table=terraform-workadventure-locks" \
           -backend-config="encrypt=true"
         working-directory: ./terraform
+  applying-terraform:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      BRANCH_NAME: ${{ github.head_ref }}
+    steps:
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.8
+      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
 #      - name: Setup Terraform variables
 #        working-directory: ./terraform
 #        id: vars
@@ -73,23 +90,23 @@ jobs:
 #          max_ec2_instances=1
 #          min_ec2_instances=1
 #          EOF
-#      - name: Terraform validate
-#        id: validate
-#        run: terraform validate
-#        working-directory: ./terraform
-#        continue-on-error: true
-#      - name: Terraform Plan
-#        id: plan
-#        run: terraform plan -out tf.plan
-#        working-directory: ./terraform
-#      - name: Terraform Apply
-#        id: apply
-#        run: terraform apply tf.plan
-#        working-directory: ./terraform
-#      - name: Terraform Output
-#        id: get_url
-#        working-directory: ./terraform
-#        run: terraform output myservice_lb
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+        working-directory: ./terraform
+        continue-on-error: true
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out tf.plan
+        working-directory: ./terraform
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply tf.plan
+        working-directory: ./terraform
+      - name: Terraform Output
+        id: kubectl_config
+        working-directory: ./terraform
+        run: terraform output kubectl_config
 #      - uses: actions/github-script@0.9.0
 #        env:
 #          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
