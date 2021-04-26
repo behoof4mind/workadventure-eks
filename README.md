@@ -3,7 +3,6 @@ This is test task: <br>
 [thecodingmachine/workadventure](https://github.com/thecodingmachine/workadventure) app in AWS EKS
 
 ## Overview
-This is example how to deal with workadventure setup in AWS EKS <br>
 **Terraform module:** [behoof4mind/tf-module-workadventure](https://github.com/behoof4mind/tf-module-workadventure) <br>
 **Own helmchart repository:** [behoof4mind/helm-charts](https://github.com/behoof4mind/helm-charts) <br>
 **CI/CD:** GitHub Actions <br>
