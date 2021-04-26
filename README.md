@@ -1,5 +1,6 @@
 # workadventure-eks
-https://github.com/thecodingmachine/workadventure infrastructure based on AWS EKS solution
+This is test task: <br> 
+[thecodingmachine/workadventure](https://github.com/thecodingmachine/workadventure) app in AWS EKS
 
 ## Overview
 This is example how to deal with workadventure setup in AWS EKS <br>
