@@ -3,7 +3,7 @@ terraform {
 }
 
 module "webserver_cluster" {
-  source                          = "github.com/behoof4mind/tf-module-workadventure?ref=0.0.8"
+  source                          = "github.com/behoof4mind/tf-module-workadventure?ref=0.0.9"
   eks_region                      = "us-east-2"
   eks_cluster_version             = "1.18"
   environment_name                = "dev"
