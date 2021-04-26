@@ -1,75 +1,15 @@
 # workadventure-eks
 https://github.com/thecodingmachine/workadventure infrastructure based on AWS EKS solution
 
-## How to prepare EKS cluster
-0. Register domain https://aws.amazon.com/getting-started/hands-on/get-a-domain/
-1. Create Hosted Zone
-2. Get host zone id
-3. Go to IAM and create new role (don't forget to replace **YOUR_HOSTED_ZONE_ID**):   
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ChangeResourceRecordSets"
-      ],
-      "Resource": [
-        "arn:aws:route53:::hostedzone/<YOUR_HOSTED_ZONE_ID>"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ListHostedZones",
-        "route53:ListResourceRecordSets"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
-```
-4. Find and copy policy ARN5. 
-5. Attach OIDC by:   
-```shell
-eksctl utils associate-iam-oidc-provider --region=<YOUR_AWS_REGION>> --cluster=<YOUR_CLUSTER_NAME> --approve
-```
-5. Create IAM service account:   
-```shell
- eksctl create iamserviceaccount \
-    --name external-dns \
-    --namespace kube-system \
-    --cluster <YOUR_CLUSTER_NAME> \
-    --attach-policy-arn YOUR_IAM_POLICY_ARN \
-    --approve \
-    --override-existing-serviceaccounts
-```
-6. Check service account IAM role
-```shell
-kubectl describe sa external-dns -n kube-system
-```
-0. Install [awscli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) 
-1. Change variables if you need
-2. Change terraform backend config to your own
-3. Set **AWS_DEFAULT_REGION**, **AWS_ACCESS_KEY_ID**, **AWS_SECRET_ACCESS_KEY** environment variables
-4. Execute ``teraform init && terraform apply``
-5. Configure kubectl
-```shell
-aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
-```
-6. Check that everything is working by
-```shell
-kubectl version
-```
-you should see client and server version 
-
-## How to install Traefik ingress controller
-1. Install helm
-2. Install traefik ingress controller by:
-```shell
-helm install traefik traefik/traefik -n traefik
-```
-3. 
+## How to use
+1. Create AWS account. [AWS Free Tier](https://aws.amazon.com/free/?trk=ps_a134p000003yLSaAAM&trkCampaign=acq_paid_search_brand&sc_channel=PS&sc_campaign=acquisition_RU&sc_publisher=Google&sc_category=Core&sc_country=RU&sc_geo=EMEA&sc_outcome=acq&sc_detail=%2Baws%20%2Baccount&sc_content=Account_bmm&sc_segment=444212697008&sc_medium=ACQ-P%7CPS-GO%7CBrand%7CDesktop%7CSU%7CAWS%7CCore%7CRU%7CEN%7CText&s_kwcid=AL!4422!3!444212697008!b!!g!!%2Baws%20%2Baccount&ef_id=Cj0KCQjwyZmEBhCpARIsALIzmnL98vW027VMl5eeYAT3LA0nUzOF-skeLa1PEB8jJqpGgj0Zm1LC4HUaAn8xEALw_wcB:G:s&s_kwcid=AL!4422!3!444212697008!b!!g!!%2Baws%20%2Baccount&all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all)
+2. Register domain. [Register a Domain Name with Amazon Route 53](https://aws.amazon.com/getting-started/hands-on/get-a-domain/)
+3. Change variables in [main.tf](./terraform/main.tf) file if you need
+4. Change variables in [helmfile.yaml](./helmfile.yaml) file if you need
+5. Change terraform backend config to your own [Terraform S3 backend](https://www.terraform.io/docs/language/settings/backends/s3.html), [How to manage Terraform state](https://blog.gruntwork.io/how-to-manage-terraform-state-28f5697e68fa)
+6. Set **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** secrets in GitHub project settings
+7. Start workflow `Prepare EKS environment` workflow in Github Actions
+8. Copy kubectl config from terraform output and put it as **KUBE_CONFIG_DATA_BASE64** secret to GitHub project settings
+9. Start workflow `Deploy app` workflow in Github Actions
+10. When worflow will finish - check `http://front.<YOUR-DOMAIN-NAME>` page (http://front.workadventure-game.link in this example)
+11. You should see web page with workadventure app

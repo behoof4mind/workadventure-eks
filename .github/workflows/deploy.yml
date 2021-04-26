@@ -48,35 +48,3 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA_BASE64 }}
         with:
           command: helmfile sync
-#      - name: Sync helmfile and app state
-#        uses: behoof4mind/helm-eks-action@master
-#        env:
-#          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-#        with:
-#          command: helmfile sync
-#      - uses: actions/github-script@0.9.0
-#        env:
-#          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-#        with:
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#          script: |
-#            const output = `#### \`${{ steps.fmt.outcome }}\` Terraform Format and Style
-#            #### \`${{ steps.init.outcome }}\` Terraform Initialization
-#            #### ️\`${{ steps.validate.outcome }}\` Terraform Validation
-#            #### \`${{ steps.plan.outcome }}\` Terraform Plan
-#            #### Please check the service here: http://${{ fromJSON(steps.get_url.outputs.stdout) }}
-#
-#            <details><summary>Show Plan</summary>
-#
-#            \`\`\`${process.env.PLAN}\`\`\`
-#
-#            </details>
-#
-#            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
-#
-#            github.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: output
-#            })
